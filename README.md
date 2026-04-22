@@ -14,14 +14,6 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Run on local network (accessible to students)
-
-```bash
-streamlit run app.py --server.address 0.0.0.0 --server.port 8501
-```
-
-Students navigate to `http://<your-machine-ip>:8501`
-
 ## Project Structure
 
 ```
@@ -44,4 +36,4 @@ Each interactive page uses `@st.fragment` to scope re-renders:
 - **Visualization fragment** — redraws only the Matplotlib/Plotly figure
 - **Equations & explainers** — fully static, never re-render
 
-This keeps interactions snappy even on modest hardware.
+

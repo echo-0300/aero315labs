@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+./__pycache__/
+*.py[cod]
+*$py.class
+./utils/__pycache__
+# Environments
+.venv/
+env/
+venv/
+.aero315/
+aero315/
+
+# Distribution (if you made an EXE)
+dist/
+build/
+*.spec
