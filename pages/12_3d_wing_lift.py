@@ -138,11 +138,11 @@ def render_plot(M, AR, e) -> None:
     fig.patch.set_facecolor(BG_PRIMARY)
     ax_lift.set_facecolor(BG_PRIMARY)
 
-    ax_lift.plot(alpha, cl_M0, label="c_l (M=0)", color=CLASS_ROYAL, linewidth=2)
-    ax_lift.plot(alpha, cl_comp, label="c_l (compressible)", color=CLASS_YELLOW, linewidth=2)
-    ax_lift.plot(alpha, CL, label="C_L (finite wing)", color=CLASS_RED, linewidth=2)
+    ax_lift.plot(alpha, cl_M0, label="$c_l$ (M=0)", color=CLASS_ROYAL, linewidth=2)
+    ax_lift.plot(alpha, cl_comp, label="$c_l$ (compressible)", color=CLASS_YELLOW, linewidth=2)
+    ax_lift.plot(alpha, CL, label="$C_L$ (finite wing)", color=CLASS_RED, linewidth=2)
 
-    ax_lift.set_xlabel("Angle of Attack (deg)", color=ACAD_GREY)
+    ax_lift.set_xlabel("Angle of Attack ($\circ$)", color=ACAD_GREY)
     ax_lift.set_ylabel("Lift Coefficient", color=ACAD_GREY)
 
     ax_lift.tick_params(axis='x', labelcolor=ACAD_GREY)
