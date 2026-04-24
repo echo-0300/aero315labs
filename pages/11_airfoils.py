@@ -79,7 +79,7 @@ if d34<10:
     d34 = str(0)+str(d34)
 else:
     pass
-naca = str(int(d1)) + str(int(d2)) + str(d34)
+naca = str(int(d2)) + str(int(d1)) + str(d34)
 
 @st.fragment
 def render_airfoil(naca: str) -> None:
@@ -103,18 +103,13 @@ def render_airfoil(naca: str) -> None:
     # To avoid the line through the middle, we plot them as two separate lines
     # or join them so they "loop" correctly.
     fig, ax = plt.subplots()
-
-    # Option 1: Plot as two separate lines (Simplest, no middle line)
-    ax.plot(x_upper, camber, color="red",linewidth=2, label="Camber")
-    ax.plot(x_upper, y_upper, color="blue", linewidth=2, label="Upper")
-    ax.plot(x_lower, y_lower, color="blue", linewidth=2, label="Lower")
-
-
-    # Option 2: Join them into one loop (Cleanest for fill/analysis)
-    # x_total = np.concatenate([x_upper, x_lower[::-1]])
-    # y_total = np.concatenate([y_upper, y_lower[::-1]])
-    # ax.plot(x_total, y_total, color="blue")
-
+    fig.patch.set_facecolor(BG_PRIMARY)
+    ax.set_facecolor(BG_PRIMARY)
+    ax.plot(x_upper, camber, color=CLASS_RED,linewidth=2, label="Camber")
+    ax.plot(x_upper, y_upper, color=GROTTO_BLUE, linewidth=2, label="Upper")
+    ax.plot(x_lower, y_lower, color=GROTTO_BLUE, linewidth=2, label="Lower")
+    ax.tick_params(axis='x', labelcolor=ACAD_GREY)
+    ax.tick_params(axis='y', labelcolor=ACAD_GREY)
     ax.set_aspect('equal', adjustable='box')
     ax.grid(True, linestyle='--', alpha=0.6)
     st.pyplot(fig)

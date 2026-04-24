@@ -48,26 +48,27 @@ with st.expander("📖  Governing Equations", expanded=True):
 
 st.divider()
 
-# ── Sliders ───────────────────────────────────────────────────────────────────
+
+# ── Sliders —
 sl_col1, sl_col2, sl_col3 = st.columns(3)
 
 with sl_col1:
-    st.markdown("**Freestream Velocity (m/s)**")
-    V = st.slider("velocity", min_value=1.0, max_value=100.0,
-                  value=30.0, step=0.5,
-                  format="V = %.1f m/s",
+    st.markdown("**Freestream Velocity (ft/s)**")
+    V = st.slider("velocity", min_value=1.0, max_value=200.0,
+                  value=20.0, step=0.5,
+                  format="V = %.1f ft/s",
                   label_visibility="collapsed")
 
 with sl_col2:
-    st.markdown("**Air Density (kg/m³)**")
-    rho = st.slider("density", min_value=0.1, max_value=1.225,
-                    value=1.225, step=0.001,
-                    format="ρ = %.3f kg/m³",
+    st.markdown("**Air Density (slug/ft³)**")
+    rho = st.slider("density", min_value=0.0005, max_value=0.002377,
+                    value=0.002377, step=0.00001,
+                    format="ρ = %.5f slug/ft³",
                     label_visibility="collapsed")
 
 with sl_col3:
     st.markdown("**Ramp Angle θ (°)**")
-    theta = st.slider("theta", min_value=-20.0, max_value=20.0,
+    theta = st.slider("theta", min_value=0.0, max_value=5.0,
                       value=0.0, step=0.5,
                       format="θ = %.1f°",
                       label_visibility="collapsed")
@@ -75,188 +76,255 @@ with sl_col3:
 @st.fragment
 def render_boundary_layer(V: float, rho: float, theta: float) -> None:
 
-    # ── Constants ─────────────────────────────────────────────────
-    mu       = 1.789e-5   # dynamic viscosity, kg/(m·s) — air at SSL
-    Re_tr    = 500_000    # flat plate transition Reynolds number
-    L_plate  = 2.0        # total plate length (m)
-    ramp_x   = L_plate / 2  # ramp located at midpoint
-    y_scaling = 20.0
+    # ── Constants — Imperial──────────────────────
+    mu       = 3.737e-7   # slug/(ft·s) — standard air at SSL
+    Re_tr    = 500_000
+    L_plate  = 1.0     
+    y_init   = 0.01 
+    A1       = 0.02      
+    ramp_x   = L_plate / 2
+    theta_rad  = np.radians(theta)
+
+    x_pos = np.linspace(0,1.0,100)
+    y_surf = np.full_like(x_pos, y_init)
+    A2 = np.full_like(x_pos, A1)
+    mask = x_pos >= ramp_x
+    y_surf[mask] = y_init - (x_pos[mask] - ramp_x) * np.sin(theta_rad)
+    A2[mask] = A1 + y_init - y_surf[mask]
+    V_local      = V * A1 / A2
 
     # ── Transition location ───────────────────────────────────────
-    # Base transition x from flat plate Re_tr
-    x_tr_base = (Re_tr * mu) / (rho * V)
+    dx = .01
+    dRe = (rho * V_local * dx) / mu
+    Re_local = np.cumsum(dRe)
+    is_turbulent = Re_local >= Re_tr
+    transition_indices = np.where(is_turbulent)[0]
+    if len(transition_indices) > 0:
+        x_tr = x_pos[transition_indices[0]]
+    else:
+        x_tr = x_pos[-1]
 
-    # Ramp effect — adverse (θ > 0) moves transition upstream,
-    # favorable (θ < 0) moves it downstream. Clamped to plate bounds.
-    ramp_factor = 1.0 - (theta / 90.0) * 0.85
-    x_tr = np.clip(x_tr_base * ramp_factor, 0.05, L_plate * 1.5)
+    # ── BL thickness —  ─────────
+    delta_lam = 4.91 * x_pos / np.sqrt(np.maximum(Re_local, 1e-10))
+    delta_turb = 0.382 * x_pos / (np.maximum(Re_local, 1e-10)**0.2)
+    transition_width = 0.02  # adjust (0.02–0.1 works well)
 
-    # ── Boundary layer thickness functions ────────────────────────
-    def delta_laminar(x):
-        Re_x = rho * V * x / mu
-        Re_x = np.maximum(Re_x, 1e-6)
-        return 5.0 * x / np.sqrt(Re_x)
+    w = 0.5 * (1 + np.tanh((x_pos - x_tr) / transition_width))
+    delta_x = (1 - w) * delta_lam + w * delta_turb
 
-    def delta_turbulent(x, x_ref, delta_ref):
-        # Turbulent BL growth from transition point, anchored to delta at x_tr
-        Re_x = rho * V * x / mu
-        Re_x = np.maximum(Re_x, 1e-6)
-        delta_turb_abs = 0.37 * x / (Re_x ** 0.2)
-        # Offset so it's continuous at transition
-        delta_ref_turb = 0.37 * x_ref / ((rho * V * x_ref / mu) ** 0.2)
-        return delta_turb_abs - delta_ref_turb + delta_ref
+    x_stations = np.array([0.1, 0.25, 0.4, 0.55, 0.7, 0.85])
+    y_stations = np.linspace(0.0, 0.04, 100)
 
-    # ── Plate geometry with ramp ──────────────────────────────────
-    theta_rad  = np.radians(theta)
-    ramp_rise  = (L_plate / 2) * np.tan(theta_rad)
+    def get_velocity_profiles(x_stations, y_stations, x_pos, y_surf, delta_x, Re_local, Re_tr, V_local):
+        profiles = {}
+        
+        for x_s in x_stations:
+            # Get data for this specific station
+            idx = np.abs(x_pos - x_s).argmin()
+            
+            delta = delta_x[idx]
+            Re = Re_local[idx]
+            U_inf = V_local[idx]
+            y_floor = y_surf[idx]  # The height of the ramp at this x
+            
+            # 1. Calculate height relative to the floor
+            y_rel = y_stations - y_floor
+            
+            # 2. Initialize profile with zeros (fluid inside/below the ramp)
+            u_profile = np.zeros_like(y_stations)
+            
+            mask_above_floor = y_rel > 0
+            
+            eta = np.minimum(y_rel[mask_above_floor] / delta, 1.0)
+            
+            if Re < Re_tr:
+                # Laminar Profile
+                u_profile[mask_above_floor] = U_inf * (1.5 * eta - 0.5 * eta**3)
+            else:
+                # Turbulent Profile
+                u_profile[mask_above_floor] = U_inf * (eta**(1/7))
+                
+            profiles[x_s] = u_profile
+            
+        return profiles
 
-    # Plate y-coordinates: flat to ramp_x, then angled to end
-    plate_x = np.array([0, ramp_x, L_plate])
-    plate_y = np.array([0, 0,      ramp_rise])
+    profiles = get_velocity_profiles(x_stations, y_stations, x_pos, y_surf, delta_x, Re_local, Re_tr, V_local)
 
-    # ── Figure ────────────────────────────────────────────────────
-    fig, ax = plt.subplots(figsize=(11, 5))
-    fig.patch.set_facecolor(BG_PRIMARY)
-    ax.set_facecolor(BG_PRIMARY)
+        # ── Draw plate ────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(11, 6))
+    fig.patch.set_facecolor(BG_PRIMARY) 
+    ax.set_facecolor(BG_PRIMARY)  
+    ax.plot(x_pos, y_surf,
+            color=ACAD_GREY, linewidth=2.5, zorder=4)
 
-    # ── Draw plate ────────────────────────────────────────────────
-    ax.plot(plate_x, plate_y, color=ACAD_GREY, linewidth=2.5, zorder=4)
-    ax.fill_between([0, ramp_x, L_plate], [0, 0, ramp_rise],
-                    [-0.08, -0.08, ramp_rise - 0.08],
+    ax.fill_between(x_pos,
+                    y_surf,
+                    y_surf - 0.08,
                     color=CLASS_ROYAL, zorder=3)
 
-    # ── BL envelope points & profile stations ────────────────────
-    n_points    = 300
-    x_lam       = np.linspace(0.001, min(x_tr, L_plate), n_points)
-    x_turb      = np.linspace(x_tr,  L_plate, n_points) if x_tr < L_plate else np.array([])
+    # ── BL envelope ───────────────────────────────────────────────
+    delta_scaled = delta_x  
 
-    # Compute delta along plate, accounting for ramp geometry
-    def plate_y_at(x):
-        """Interpolate plate surface y at position x."""
-        return np.interp(x, plate_x, plate_y)
+    lam_mask  = x_pos <= x_tr
+    turb_mask = x_pos > x_tr
 
-    delta_lam_vals  = delta_laminar(x_lam)
-    delta_at_tr     = delta_laminar(x_tr) if x_tr <= L_plate else delta_laminar(L_plate)
+    # Laminar region
+    ax.plot(x_pos[lam_mask],
+            y_surf[lam_mask] + delta_scaled[lam_mask],
+            color=USAFA_BLUE, linewidth=2.0, zorder=5,
+            label='Laminar BL edge')
 
-    # BL envelope y = plate surface y + delta
-    env_lam_y = (plate_y_at(x_lam) + delta_lam_vals) * y_scaling
+    ax.fill_between(x_pos[lam_mask],
+                    y_surf[lam_mask],
+                    y_surf[lam_mask] + delta_scaled[lam_mask],
+                    color=USAFA_BLUE, alpha=0.12, zorder=2)
 
-    # Draw laminar envelope
-    ax.plot(x_lam, env_lam_y,
-            color=USAFA_BLUE, linewidth=2.0,
-            linestyle='-', zorder=5, label='Laminar BL edge')
-    ax.fill_between(x_lam, plate_y_at(x_lam), env_lam_y,
-                    color=USAFA_BLUE, alpha=0.10, zorder=2)
+    # Turbulent region
+    if np.any(turb_mask):
+        ax.plot(x_pos[turb_mask],
+                y_surf[turb_mask] + delta_scaled[turb_mask],
+                color=CLASS_RED, linewidth=2.0, zorder=5,
+                label='Turbulent BL edge')
 
-    if len(x_turb) > 1:
-        delta_turb_vals = delta_turbulent(x_turb, x_tr, delta_at_tr)
-        env_turb_y      = plate_y_at(x_turb) + delta_turb_vals * y_scaling
+        ax.fill_between(x_pos[turb_mask],
+                        y_surf[turb_mask],
+                        y_surf[turb_mask] + delta_scaled[turb_mask],
+                        color=CLASS_RED, alpha=0.12, zorder=2)
 
-        ax.plot(x_turb, env_turb_y,
-                color=CLASS_RED, linewidth=2.0,
-                linestyle='-', zorder=5, label='Turbulent BL edge')
-        ax.fill_between(x_turb, plate_y_at(x_turb), env_turb_y,
-                        color=CLASS_RED, alpha=0.10, zorder=2)
-
-    # ── Transition line ───────────────────────────────────────────
+    # ── Transition marker ─────────────────────────────────────────
     if x_tr <= L_plate:
-        tr_plate_y = plate_y_at(x_tr)
-        tr_delta   = delta_at_tr * y_scaling
-        ax.plot([x_tr, x_tr],
-                [tr_plate_y, tr_plate_y + tr_delta * 1.6],
+        idx_tr = np.abs(x_pos - x_tr).argmin()
+        tr_x   = x_pos[idx_tr]
+        tr_y   = y_surf[idx_tr]
+        tr_d   = delta_scaled[idx_tr]
+
+        ax.plot([tr_x, tr_x],
+                [tr_y, tr_y + .025],
                 color=CLASS_YELLOW, linewidth=1.2,
                 linestyle='--', zorder=6)
-        ax.text(x_tr, tr_plate_y + tr_delta * 1.7,
-                f'Transition\nx = {x_tr:.2f} m',
+
+        ax.text(tr_x, tr_y + .03,
+                f'Transition\nx = {tr_x:.3f} ft\nRe = {Re_tr:,}',
                 color=CLASS_YELLOW, fontsize=7,
-                fontfamily='monospace', ha='center', va='bottom')
+                fontfamily='monospace',
+                ha='center', va='bottom')
     else:
-        ax.text(L_plate * 0.7, 0.28,
-                'Transition beyond\nplate length',
+        ax.text(0.6, 0.35,
+                'Transition beyond plate\n(fully laminar)',
                 color=CLASS_YELLOW, fontsize=7,
-                fontfamily='monospace', ha='center',
-                style='italic', alpha=0.8)
+                fontfamily='monospace',
+                ha='center', style='italic', alpha=0.8)
 
-    # ── Velocity profile stations ─────────────────────────────────
-    n_stations  = 8
-    stations    = np.linspace(0.15, L_plate - 0.05, n_stations)
-    n_vectors   = 12   # arrows per station
+        # ── Velocity profiles at chosen stations ──────────────────────
+    n_vectors = 50
+    y_max = 0.04
 
-    for x_s in stations:
-        is_turbulent = x_s > x_tr
-        py           = plate_y_at(x_s)
+    bl_edge_x = []
+    bl_edge_y = []
 
-        if x_s <= min(x_tr, L_plate):
-            delta_s = delta_laminar(x_s)
-        else:
-            delta_s = delta_turbulent(x_s, x_tr, delta_at_tr)
+    for x_s in x_stations:
+        idx = np.abs(x_pos - x_s).argmin()
 
-        delta_s = max(delta_s, 0.01) * y_scaling
+        y_floor = y_surf[idx]
+        U_inf   = V_local[idx]
+        Re      = Re_local[idx]
+        delta   = delta_x[idx]
 
-        # y positions for vectors within BL
-        y_pts = np.linspace(0, delta_s, n_vectors)
+        y_pts = np.linspace(y_floor, y_max, n_vectors)
 
-        for y_pt in y_pts:
-            eta = y_pt / delta_s   # normalized height 0→1
+        for y in y_pts:
+            y_rel = y - y_floor
 
-            # Profile shape: laminar = parabolic, turbulent = 1/7 power law
-            if is_turbulent:
-                u_norm = eta ** (1/7)
+            if y_rel <= 0:
+                continue
+
+            eta = min(y_rel / delta, 1.0)
+
+            # Velocity profile
+            if Re < Re_tr:
+                u = U_inf * (1.5 * eta - 0.5 * eta**3)
+                color = USAFA_BLUE
             else:
-                u_norm = 2 * eta - eta ** 2
+                u = U_inf * (eta ** (1/7))
+                color = CLASS_RED
 
-            arrow_len = u_norm * 0.25   # scale to plot units
-            color     = CLASS_RED if is_turbulent else USAFA_BLUE
+            u_norm = u / U_inf
+
+            arrow_len = u_norm * 0.12
 
             ax.annotate('',
-                        xy=(x_s + arrow_len, py + y_pt),
-                        xytext=(x_s, py + y_pt),
+                        xy=(x_s + arrow_len, y),
+                        xytext=(x_s, y),
                         arrowprops=dict(arrowstyle='->',
                                         color=color,
                                         lw=0.8,
                                         mutation_scale=5),
                         zorder=7)
 
+        # ── Boundary layer edge extraction ────────────────────────
+        # Find where velocity reaches ~99% freestream
+        profile = profiles[x_s]
+
+        idx_edge = np.argmax(profile >= 0.99 * U_inf)
+
+        if profile[idx_edge] >= 0.99 * U_inf:
+            y_edge = y_stations[idx_edge]
+        else:
+            y_edge = y_floor + delta  # fallback
+
+        bl_edge_x.append(x_s)
+        bl_edge_y.append(y_edge)
+
     # ── Freestream arrows ─────────────────────────────────────────
-    for y_fs in [0.32, 0.42, 0.52]:
+    for y_fs in [0.055, 0.65, 0.75]:
         ax.annotate('',
-                    xy=(0.25, y_fs), xytext=(0.02, y_fs),
+                    xy=(0.18, y_fs),
+                    xytext=(0.02, y_fs),
                     arrowprops=dict(arrowstyle='->',
                                     color=GROTTO_BLUE,
-                                    lw=1.2, mutation_scale=8,
+                                    lw=1.2,
+                                    mutation_scale=8,
                                     alpha=0.7))
-    ax.text(0.02, 0.56, f'V∞ = {V:.1f} m/s',
-            color=GROTTO_BLUE, fontsize=7,
-            fontfamily='monospace', alpha=0.8)
 
-    # ── Re readout ────────────────────────────────────────────────
-    Re_plate = rho * V * L_plate / mu
-    ax.text(L_plate * 0.01, -0.13,
-            f'Re at plate end = {Re_plate:,.0f}     '
-            f'ρ = {rho:.3f} kg/m³     '
-            f'μ = {mu:.2e} Pa·s     '
+    ax.text(0.10, 0.050,
+            f'V∞ = {V:.1f} ft/s',
+            color=GROTTO_BLUE, fontsize=7,
+            fontfamily='monospace',
+            ha='center', alpha=0.8)
+
+    # ── Stats readout ─────────────────────────────────────────────
+    Re_end = Re_local[-1]
+
+    ax.text(0.0, -0.018,
+            f'Re (plate end) = {Re_end:,.0f}     '
+            f'ρ = {rho:.5f} slug/ft³     '
+            f'μ = {mu:.2e} slug/ft·s     '
             f'θ = {theta:.1f}°',
             color=ACAD_GREY, fontsize=7,
             fontfamily='monospace')
+    
 
     # ── Legend ────────────────────────────────────────────────────
     ax.legend(loc='upper left',
-              facecolor=CLASS_ROYAL,
-              edgecolor=USAFA_BLUE,
-              labelcolor=ACAD_WHITE,
-              fontsize=7, framealpha=0.9)
+            facecolor=CLASS_ROYAL,
+            edgecolor=USAFA_BLUE,
+            labelcolor=ACAD_WHITE,
+            fontsize=7,
+            framealpha=0.9)
 
-    ax.set_xlim(-0.1, L_plate + 0.15)
-    ax.set_ylim(-0.18, 0.65)
-    ax.axis('off')
+    ax.set_xlim(0.0, L_plate)
+    ax.set_ylim(-0.01, 0.04)
+    ax.tick_params(axis='x', labelcolor=ACAD_GREY)
+    ax.tick_params(axis='y', labelcolor=ACAD_GREY)
 
-    plt.tight_layout(pad=0.4)
-    st.pyplot(fig, width='stretch')
+    
+    st.pyplot(fig, width='content')
     plt.close(fig)
 
 render_boundary_layer(V, rho, theta)
 
 st.divider()
+
 with st.expander("💡  Physical Interpretation"):
     st.markdown("""
         **Laminar vs. Turbulent Velocity Profiles**

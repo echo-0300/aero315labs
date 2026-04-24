@@ -7,6 +7,8 @@ Interactive aerodynamics simulation suite built with Streamlit.
 ```bash
 pip install -r requirements.txt
 ```
+Line 35 of Airfoils.py in the Airfoils lib requires changing due to scipy modernization:
+from scipy.differentiate import derivative
 
 ## Run locally
 
