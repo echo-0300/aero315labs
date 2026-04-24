@@ -38,12 +38,13 @@ with st.expander("📖  Governing Equations", expanded=True):
 st.divider()
 
 col_press, col_gap, col_altitude = st.columns([1, 0.5,1])
-
+st.markdown("**Select Freestream Pressure (Altitude)**")
 P_inf = st.slider("P_inf", min_value=500.0, max_value=2116.22,
                   value=2116.22, step=1.0,
                   format="P∞ = %.2f psf",
                   label_visibility="collapsed")
 
+st.markdown("**Select Total Pressure (always greater than P∞)**")
 P_0 = st.slider("P_0", min_value=float(P_inf + 1.0), max_value=float(P_inf * 1.25),
                 value=float(P_inf + 1.0), step=1.0,
                 format="P₀ = %.2f psf",
@@ -167,7 +168,7 @@ def render_pitot(P_0: float, P_inf: float) -> None:
                                  lw=1.2, mutation_scale=8))
     ax1.text(0.75, (line_bot + line_bot + 0.05) / 2,
              f'ΔP = {delta_p:.1f} psf',
-             color=CLASS_RED, fontsize=9,
+             color=CLASS_RED, fontsize=12,
              fontfamily='monospace', va='center')
 
     # ── Freestream arrows ─────────────────────────────────────────
@@ -273,3 +274,18 @@ def render_pitot(P_0: float, P_inf: float) -> None:
     plt.close(fig)
 
 render_pitot(P_0,P_inf)
+
+st.divider()
+with st.expander("💡  Physical Interpretation"):
+    st.markdown("""
+        **Total Pressure > Free Stream Pressure**
+
+        - When the aircraft is in motion it is forcing air into the total pressure port, which captures the higher pressure value.
+        - The static ports (parallel to the flow) attempt to capture only the internal pressure of the air, without any of the effects of the velocity.
+        """)
+    st.markdown("""
+        **Limitations**
+
+        - There is no simple way to measure the density of the outside air, so the system assumes a constant density and uses a nominal sea level value.
+        - Does this effect mean the 'real' airspeed is higher or lower than the value indicated on the guage?
+        """)
