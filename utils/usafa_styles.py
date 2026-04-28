@@ -400,7 +400,7 @@ def render_sidebar() -> None:
         st.markdown(
             "<div style='font-family:\"Barlow Condensed\",\"Trebuchet MS\",sans-serif;"
             "font-size:0.65rem;color:#B2B4B2;letter-spacing:0.1em;margin-top:1rem;'>"
-            "v0.1.0 &nbsp;·&nbsp; AY2025-2026</div>",
+            "v0.1.2 &nbsp;·&nbsp; AY2025-2026</div>",
             unsafe_allow_html=True
         )
 
