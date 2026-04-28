@@ -1,13 +1,17 @@
 # AeroFundamentals Lab
 
-Interactive aerodynamics simulation suite built with Streamlit.
+Interactive aerodynamics simulation suite built with Streamlit as an extension and modernization of Dr. Steven Brandt's Virtual Lab files.
+This was created by Maj Matthew Thompson with reference to Introduction to Aeronautics - A Design Perspective, the Virtual Labs' and various 
+LLMs to assist in coding/debuging. 
+
+v0.1.2
 
 ## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
-Line 35 of Airfoils.py in the Airfoils lib requires changing due to scipy modernization:
+Line 35 of Airfoils.py in the Airfoils lib requires updating due to scipy modernization:
 from scipy.differentiate import derivative
 
 ## Run locally
@@ -19,13 +23,9 @@ streamlit run app.py
 ## Project Structure
 
 ```
-aero_demos/
+labs/
 ├── app.py                       # Home page / main menu
 ├── pages/
-│   ├── 01_mach_angle.py         # Mach cone & oblique shock geometry
-│   ├── 02_pitot_static.py       # Pitot-static & dynamic pressure (placeholder)
-│   ├── 03_standard_atmosphere.py# ISA standard atmosphere (placeholder)
-│   └── 04_altimetry.py          # Altimeter & Kollsman window (placeholder)
 ├── requirements.txt
 └── README.md
 ```
