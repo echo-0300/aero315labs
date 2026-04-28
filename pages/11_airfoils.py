@@ -4,7 +4,7 @@ from utils.usafa_styles import *
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from airfoils import Airfoil
+from utils.airfoils import Airfoil
 
 st.set_page_config(page_title="Airfoils - Virtual Lab", page_icon="🪽", layout="wide")
 st.markdown(USAFA_CSS, unsafe_allow_html=True)
