@@ -226,7 +226,7 @@ def render_perf(S: float, c_ft: float, V_knots: float):
     vis = 80.0                        # visibility multiplier
     half_span  = (span / 2) * vis     # ft, scaled to be visible
     chord      = c_ft * vis
-    fuse_len   = c_ft * vis * 2
+    fuse_len   = c_ft * vis * 10
     fuse_rad   = (c_ft * vis) * 0.05
     fuse_h     = h * 0.001
     tail_half  = half_span * 0.35
@@ -358,3 +358,12 @@ def render_perf(S: float, c_ft: float, V_knots: float):
     st.plotly_chart(fig2, width='stretch')
 render_perf(S, c_ft, V_knots)
 
+st.divider()
+with st.expander("💡  Physical Intuition"):
+    st.markdown("""
+        **Gliding at the Best Speed**
+
+        - When gliding too fast, the aircraft is headed down towards the ground more quickly, reducing overall range.
+        - when gliding too slowly, the aircraft is not carrying forward quickly enough.
+        - Balancing these two occurs at the maximum lift to drag ratio, allowing for the maximum glide distance.
+        """)
