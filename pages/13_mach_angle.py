@@ -146,7 +146,7 @@ def render_visualization(mach: float) -> None:
     nose_x      = 3.0
     body_length = 4.5
 
-    img = mpimg.imread("assets\sr71.png")
+    img = mpimg.imread("assets/sr71.png")
 
 # Positioning (tweak these)
     img_extent = [
