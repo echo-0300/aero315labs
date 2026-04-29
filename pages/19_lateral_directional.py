@@ -89,9 +89,10 @@ def render_plots(stability: str) -> None:
         fig_top.add_layout_image(
             dict(
                 source=img1,
-                xref="x", yref="y",
-                x=6, y=8,
-                sizex=20, sizey=8,
+                xref="paper", yref="paper",
+                x=0.5, y=.75,
+                sizex=1.0, sizey=0.7,
+                xanchor="center", yanchor="top",
                 sizing="contain",
                 opacity=0.8,
                 layer="below"
@@ -105,8 +106,8 @@ def render_plots(stability: str) -> None:
             pass
         else:
             fig_top.add_annotation(
-                x=10 + 2 * np.abs(beta) * -force_dir, y=1,   # arrow tip
-                ax=10, ay=1,                 # arrow base
+                x=10 + 2 * np.abs(beta) * -force_dir, y=5.8,   # arrow tip
+                ax=10, ay=5.8,                 # arrow base
                 xref="x", yref="y",
                 axref="x", ayref="y",
                 showarrow=True,
@@ -116,7 +117,7 @@ def render_plots(stability: str) -> None:
                 arrowcolor=CLASS_RED,
             )
             fig_top.add_annotation(
-                x=x0-.3, y=1.5,
+                x=x0-.3, y=5.6,
                 text="Tail Lift",
                 showarrow=False,
                 font=dict(color=CLASS_RED, size=12),
@@ -160,7 +161,7 @@ def render_plots(stability: str) -> None:
             paper_bgcolor=BG_PRIMARY,
             plot_bgcolor=BG_SECONDARY,
             xaxis=dict(range=[0,20], visible=False),
-            yaxis=dict(range=[0,10], visible=False),
+            yaxis=dict(range=[5,9], visible=False),
             height=600,
             margin=dict(l=0,r=0,t=0,b=0)
         )
