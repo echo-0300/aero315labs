@@ -397,6 +397,11 @@ def render_sidebar() -> None:
         st.page_link("pages/15_glide.py",                 label="🍂  Glides")
         st.page_link("pages/16_climb.py",                 label="🗻  Climbs")
         st.page_link("pages/17_turns.py",                 label="🛞  Turns")
+        st.divider()
+        st.markdown("### Stability")
+        st.page_link("pages/18_longitudinal_stability.py",label="⚖️  Longitudinal Stability")
+        st.page_link("pages/19_lateral_directional.py",   label="🎯  Lateral-Direction Stability")
+        st.page_link("pages/20_dynamic_instability.py",   label="🧨  Dynamic Instability")
         st.markdown(
             "<div style='font-family:\"Barlow Condensed\",\"Trebuchet MS\",sans-serif;"
             "font-size:0.65rem;color:#B2B4B2;letter-spacing:0.1em;margin-top:1rem;'>"

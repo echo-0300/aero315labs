@@ -96,6 +96,15 @@ labs = [
 
     ("turns", "🛞", "Turns",
      "Understand coordinated turns, load factor, and turning performance limits.", "grotto"),
+     # --- Performance ---
+    ("longitudinal_stability", "⚖️", "Longitudinal Stability",
+     "Explore the effects of wing and tail position on longitudinal stability.", "red"),
+
+    ("lateral_directional", "🎯", "Lateral Directional Stability",
+     "Examine the interaction between rolling and yawing moments.", "yellow"),
+
+    ("dynamic_instability", "🧨", "Dynamic Instability",
+     "Understand the various modes of dynamic instability.", "grotto"),
 ]
 
 # --- Render grid ---

@@ -84,8 +84,7 @@ naca = str(int(d2)) + str(int(d1)) + str(d34)
 @st.fragment
 def render_airfoil(naca: str) -> None:
     foil = Airfoil.NACA4(naca)
-    # The library returns [ [upper_x, lower_x], [upper_y, lower_y] ] 
-    # or a 3D structure that confuses standard slicing.
+    # The library returns [ [upper_x_1, upper_x_2, ... lower_x_1, ...], [upper_y_2, lower_y_2..., lower_y_1, ...] ] 
     coords = foil.all_points 
 
 
