@@ -61,12 +61,12 @@ with ctrl_col:
 with slider_col:
     st.markdown("**Altitude**")
     alt_slide = st.slider(
-        label="mach_slider",
+        label="alt",
         min_value=0.0, max_value=alt_max,
         value=0.0, step=0.01,
-        format="M = %.2f",
+        format="Altitude = %.2f {alt_units}",
         label_visibility="collapsed",
-        key="mach"
+        key="alt"
     )
 
 def render_atmosphere(alt_slide: float, units: str) -> None:
