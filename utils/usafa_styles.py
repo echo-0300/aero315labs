@@ -338,6 +338,51 @@ USAFA_CSS = """
         letter-spacing: 0.08em;
         color: var(--text-primary);
     }
+
+    /* ── Dropdown / Selectbox Overrides ─────────────────────────── */
+    /* Target the container and the control menu */
+    div[data-baseweb="select"] > div {
+        background-color: var(--bg-card) !important;
+        border-color: var(--border) !important;
+    }
+
+    /* Target the text inside the dropdown */
+    div[data-baseweb="select"] * {
+        color: var(--text-primary) !important;
+        fill: var(--text-primary) !important;
+    }
+
+    /* Target the dropdown menu list when opened */
+    ul[data-baseweb="menu"] {
+        background-color: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    /* Target individual items in the dropdown list */
+    li[data-baseweb="option"] {
+        background-color: transparent !important;
+        color: var(--text-primary) !important;
+    }
+
+    li[data-baseweb="option"]:hover {
+        background-color: var(--usafa-blue) !important;
+    }
+
+    /* ── Expander / Collapsible Overrides ───────────────────────── */
+    /* Fixes the white background in headers and content */
+    [data-testid="stExpander"] {
+        background-color: var(--bg-secondary) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    [data-testid="stExpanderDetails"] {
+        background-color: var(--bg-primary) !important;
+    }
+
+    /* Ensure icons/arrows in selectboxes and expanders aren't lost */
+    svg {
+        fill: currentColor !important;
+    }
 </style>
 """
 

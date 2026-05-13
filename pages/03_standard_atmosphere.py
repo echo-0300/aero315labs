@@ -63,7 +63,7 @@ with slider_col:
     alt_slide = st.slider(
         label="alt",
         min_value=0.0, max_value=alt_max,
-        value=0.0, step=0.01,
+        value=0.0, step=1.0,
         format=f"Altitude = %.2f {alt_units}",
         label_visibility="collapsed",
         key="alt"
