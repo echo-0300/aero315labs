@@ -64,7 +64,7 @@ with slider_col:
         label="alt",
         min_value=0.0, max_value=alt_max,
         value=0.0, step=0.01,
-        format="Altitude = %.2f {alt_units}",
+        format=f"Altitude = %.2f {alt_units}",
         label_visibility="collapsed",
         key="alt"
     )
