@@ -383,6 +383,48 @@ USAFA_CSS = """
     svg {
         fill: currentColor !important;
     }
+
+    /* ── Dropdown Menu (Open State) ────────────────────────────── */
+    /* This targets the popover container that appears when clicked */
+    div[data-baseweb="popover"] {
+        background-color: var(--bg-card) !important;
+    }
+
+    /* Target the list container and individual options */
+    ul[role="listbox"] {
+        background-color: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    li[role="option"] {
+        background-color: transparent !important;
+        color: var(--text-primary) !important;
+    }
+
+    li[role="option"]:hover {
+        background-color: var(--usafa-blue) !important;
+        color: var(--academy-white) !important;
+    }
+
+    /* ── Expander Overrides ────────────────────────────────────── */
+    /* Target the expander container */
+    [data-testid="stExpander"] {
+        background-color: var(--bg-secondary) !important;
+        border: 1px solid var(--border) !important;
+    }
+
+    /* Target the header text and icon */
+    [data-testid="stExpander"] summary {
+        color: var(--academy-white) !important;
+        background-color: var(--bg-secondary) !important;
+    }
+
+    /* Target the collapsible internal content area */
+    [data-testid="stExpanderDetails"] {
+        background-color: var(--bg-primary) !important;
+        border-top: 1px solid var(--border);
+        padding-top: 1rem;
+    }
 </style>
 """
 
