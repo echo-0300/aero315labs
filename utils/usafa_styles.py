@@ -67,17 +67,43 @@ USAFA_CSS = """
     [data-testid="stSidebar"] {
         background-color: var(--bg-secondary);
         border-right: 3px solid var(--usafa-blue);
+        /* Edge: force color-scheme so inherited text colors resolve correctly */
+        color-scheme: dark;
     }
 
+    /* Sidebar section headings (### Navigation, ### Performance, etc.) */
     [data-testid="stSidebar"] .stMarkdown h1,
     [data-testid="stSidebar"] .stMarkdown h2,
-    [data-testid="stSidebar"] .stMarkdown h3 {
+    [data-testid="stSidebar"] .stMarkdown h3,
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
         font-family: 'Barlow Condensed', 'Trebuchet MS', sans-serif;
-        color: var(--class-yellow);
+        color: #FFC72C !important;
         font-size: 0.7rem;
         font-weight: 700;
         letter-spacing: 0.2em;
         text-transform: uppercase;
+    }
+
+    /* Sidebar page_link anchors — Edge does not inherit color from :root */
+    [data-testid="stSidebar"] a,
+    [data-testid="stSidebar"] a:visited,
+    [data-testid="stSidebar"] [data-testid="stPageLink"] a,
+    [data-testid="stSidebar"] [data-testid="stPageLink"] span,
+    [data-testid="stSidebar"] .stPageLink span,
+    [data-testid="stSidebar"] p {
+        color: #E8EBF4 !important;
+    }
+
+    [data-testid="stSidebar"] a:hover,
+    [data-testid="stSidebar"] [data-testid="stPageLink"] a:hover {
+        color: #FFC72C !important;
+    }
+
+    /* Dividers in sidebar */
+    [data-testid="stSidebar"] hr {
+        border-color: #003080 !important;
     }
 
     /* ── Page title block ────────────────────────────────────────── */
@@ -340,32 +366,53 @@ USAFA_CSS = """
     }
 
     /* ── Dropdown / Selectbox Overrides ─────────────────────────── */
-    /* Target the container and the control menu */
-    div[data-baseweb="select"] > div {
-        background-color: var(--bg-card) !important;
-        border-color: var(--border) !important;
+    /* Edge fix: set color-scheme on the select wrapper so the browser
+       does not override form control colors with the system light theme */
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div > div {
+        color-scheme: dark !important;
+        background-color: #002060 !important;
+        border-color: #003080 !important;
     }
 
-    /* Target the text inside the dropdown */
-    div[data-baseweb="select"] * {
-        color: var(--text-primary) !important;
-        fill: var(--text-primary) !important;
-    }
-
-    /* Target the dropdown menu list when opened */
-    ul[data-baseweb="menu"] {
-        background-color: var(--bg-card) !important;
-        border: 1px solid var(--border) !important;
-    }
-
-    /* Target individual items in the dropdown list */
-    li[data-baseweb="option"] {
+    /* Text and icons inside the closed control */
+    div[data-baseweb="select"] *,
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] input {
+        color: #E8EBF4 !important;
+        fill: #E8EBF4 !important;
         background-color: transparent !important;
-        color: var(--text-primary) !important;
     }
 
-    li[data-baseweb="option"]:hover {
-        background-color: var(--usafa-blue) !important;
+    /* The floating popover wrapper Edge renders as a separate stacking context */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div {
+        color-scheme: dark !important;
+        background-color: #002060 !important;
+    }
+
+    /* Dropdown menu list when opened */
+    ul[data-baseweb="menu"],
+    ul[role="listbox"] {
+        color-scheme: dark !important;
+        background-color: #002060 !important;
+        border: 1px solid #003080 !important;
+    }
+
+    /* Individual items */
+    li[data-baseweb="option"],
+    li[role="option"] {
+        background-color: #002060 !important;
+        color: #E8EBF4 !important;
+    }
+
+    li[data-baseweb="option"]:hover,
+    li[role="option"]:hover,
+    li[data-baseweb="option"][aria-selected="true"],
+    li[role="option"][aria-selected="true"] {
+        background-color: #003594 !important;
+        color: #FFFFFF !important;
     }
 
     /* ── Expander / Collapsible Overrides ───────────────────────── */
@@ -384,27 +431,7 @@ USAFA_CSS = """
         fill: currentColor !important;
     }
 
-    /* ── Dropdown Menu (Open State) ────────────────────────────── */
-    /* This targets the popover container that appears when clicked */
-    div[data-baseweb="popover"] {
-        background-color: var(--bg-card) !important;
-    }
-
-    /* Target the list container and individual options */
-    ul[role="listbox"] {
-        background-color: var(--bg-card) !important;
-        border: 1px solid var(--border) !important;
-    }
-
-    li[role="option"] {
-        background-color: transparent !important;
-        color: var(--text-primary) !important;
-    }
-
-    li[role="option"]:hover {
-        background-color: var(--usafa-blue) !important;
-        color: var(--academy-white) !important;
-    }
+    /* Dropdown open-state overrides consolidated above */
 
     /* ── Expander Overrides ────────────────────────────────────── */
     /* Target the expander container */
