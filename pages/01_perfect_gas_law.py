@@ -182,9 +182,9 @@ def render_calcs(slide: float, units: str, param: str) -> None:
 
     # ── Pressure gauge range ──────────────────────────────────────
     if units == "SI":
-        p_min_gauge, p_max_gauge = 0, 1000000.0
+        p_max_gauge, p_min_gauge = 0, 1000000.0
     else:
-        p_min_gauge, p_max_gauge = 0, 15000.0
+        p_max_gauge, p_min_gauge = 0, 15000.0
 
     # ── Layout constants ──────────────────────────────────────────
     cyl_left   = 0.1
@@ -280,7 +280,7 @@ def render_calcs(slide: float, units: str, param: str) -> None:
     ax2.text(cx - r - 0.04, cy, '0',
              color=brand.ACAD_GREY, fontsize=7,
              fontfamily='monospace', ha='right', va='center')
-    ax2.text(cx + r + 0.04, cy, f'{p_max_gauge:.0f}',
+    ax2.text(cx + r + 0.04, cy, f'{p_min_gauge:.0f}',
              color=brand.ACAD_GREY, fontsize=7,
              fontfamily='monospace', ha='left', va='center')
     ax2.text(cx, cy - 0.12, f'P = {p_curr:.1f} {p_unit}',

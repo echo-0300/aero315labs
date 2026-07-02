@@ -89,7 +89,6 @@ def render_calcs(V2):
         y_pos_label = -2
     ax.text(-3, -2, f"P₁: {P1:.1f} Pa\nA₁={A1:.2f} m²\nV₁={V1:.2f} m/s", color=ACAD_WHITE, ha='center')
     ax.text(3, y_pos_label, f"P₂: {P2:.1f} Pa\nA₂={A2:.2f} m²\nV₂={V2:.2f} m/s", color=CLASS_YELLOW, ha='center')
-    ax.text(0, 2, f"P₀: {P0:.1f} Pa", color=CLASS_RED, ha='center', fontweight='bold')
 
     ax.set_ylim(-2, 2)
     ax.axis('off')
