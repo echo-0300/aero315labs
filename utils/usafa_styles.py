@@ -500,6 +500,7 @@ def render_sidebar() -> None:
         st.divider()
         st.markdown("### Airfoils")
         st.page_link("pages/10_boundary_layer.py",        label="🍰  Boundary Layer")
+        st.page_link("pages/11_b_airfoil_aerodynamics.py",label="💸  Airfoil Aero")
         st.page_link("pages/11_airfoils.py",              label="🪽  2-D Airfoils")
         st.page_link("pages/12_3d_wing_lift.py",          label="✈️  3-D Wing Lift")
         st.divider()

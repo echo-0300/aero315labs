@@ -74,8 +74,11 @@ labs = [
     ("boundary_layer", "🍰", "Boundary Layer",
      "Visualize laminar and turbulent boundary layers and their growth along a surface.", "yellow"),
 
-    ("airfoils", "🪽", "2-D Airfoils",
+    ("b_airfoil_aerodynamics", "💸", "Airfoil Aero",
      "Examine lift generation, pressure distribution, and angle-of-attack effects on airfoil performance.", "grotto"),
+
+    ("airfoils", "🪽", "2-D Airfoils",
+     "Evaluate airfoil geometry based on NACA 4-Digit Code.", "grotto"),
 
     ("3d_wing_lift", "✈️", "3-D Wing Lift",
      "Understand finite wing effects, induced drag, and spanwise lift distribution.", "red"),
