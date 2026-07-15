@@ -105,5 +105,5 @@ with st.expander("💡  Physical Interpretation"):
     st.markdown("""
         **Practical Consideration**
         - What value are you left with if you stop the flow? Can this be useful in determining
-         your altitude?
+         your airspeed?
         """)
