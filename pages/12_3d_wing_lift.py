@@ -69,7 +69,7 @@ with col2:
     AR = st.slider("AR", 2.0, 15.0, 8.0, step=0.5, label_visibility="collapsed")
 
 with col3:
-    st.markdown("**Oswald Efficiency (e)**")
+    st.markdown("**Span Efficiency Factor (e)**")
     e = st.slider("e", 0.5, 1.0, 0.8, step=0.01, label_visibility="collapsed")
 
 @st.fragment
